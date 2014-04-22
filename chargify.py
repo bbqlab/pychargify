@@ -176,7 +176,6 @@ class ChargifyBase(object):
         """
         Apply the values of the passed data to a new class of the current type
         """
-        print xml
         dom = minidom.parseString(self.fix_xml_encoding(xml))
         nodes = dom.getElementsByTagName(node_name)
         objs = []
@@ -211,11 +210,8 @@ class ChargifyBase(object):
         }
 
         r = httplib.HTTPSConnection(self.request_host)
-        print('url-- %s' % (self.request_host + url))
         r.request('GET', url, None, headers)
         response = r.getresponse()
-
-        print ("Response STATUS %s" % response.status)
 
         # Unauthorized Error
         if response.status == 401:
@@ -272,9 +268,6 @@ class ChargifyBase(object):
         http.putheader("Content-Type", 'text/xml; charset="UTF-8"')
         http.endheaders()
 
-        print('url %s' % (self.request_host + url))
-
-        print('sending: %s' % data)
 
         http.send(data)
         response = http.getresponse()
@@ -297,7 +290,6 @@ class ChargifyBase(object):
 
         # Generic Server Errors
         elif response.status in [405, 500]:
-            print response.read()
             raise ChargifyServerError()
 
         return response.read()
@@ -507,12 +499,14 @@ class ChargifyAllocations(ChargifyBase):
     quantity = ''
     previous_quantity = ''
     memo = ''
+    updated_at = None
     proration_upgrade_scheme = ''
     proration_downgrade_scheme = ''
     timestamp = ''
 
     def __init__(self, apikey, subdomain, nodename=''):
         super(ChargifyAllocations, self).__init__(apikey, subdomain)
+        self.__ignore__.extend(['component_id', 'subscription_id','updated_at'])
         if nodename:
             self.__xmlnodename__ = nodename
 
