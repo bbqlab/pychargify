@@ -518,6 +518,31 @@ class ChargifyAllocations(ChargifyBase):
                             (self.subscription_id, self.component_id), 'allocation')
 
 
+class ChargifyMigrations(ChargifyBase):
+    """
+    Represents Chargify Migrations
+    @license    GNU General Public License
+    """
+    __name__ = 'ChargifyMigrations'
+    __attribute_types__ = {}
+    __xmlnodename__ = 'migration'
+
+
+    updated_at = None
+    subscription_id = 0
+    include_trial = 0
+    product_handle = ''
+
+    def __init__(self, apikey, subdomain, nodename=''):
+        super(ChargifyMigrations, self).__init__(apikey, subdomain)
+        self.__ignore__.extend(['subscription_id', 'updated_at'])
+
+        if nodename:
+            self.__xmlnodename__ = nodename
+
+    def save(self):
+        return self._save('subscriptions/%s/migrations' % (self.subscription_id), 'migration')
+
 
 class Usage(object):
     def __init__(self, id, memo, quantity):
@@ -744,3 +769,7 @@ class Chargify:
 
     def Allocations(self, nodename=''):
         return ChargifyAllocations(self.api_key, self.sub_domain, nodename)
+
+    def Migrations(self, nodename=''):
+        return ChargifyMigrations(self.api_key, self.sub_domain, nodename)
+
